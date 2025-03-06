@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  password        String
+  name            String
+  phone           String
+  relation        String
+  
+  // Director Info (optional)
+  directorName    String?
+  directorCompany String?
+  directorEmail   String?
+  
+  // Deceased Info
+  deceasedName    String
+  dateOfBirth     DateTime
+  dateOfPassing   DateTime
+  specialRequests String?   @db.Text
+  
+  // Service Details
+  servicePlan     String
+  servicePrice    Decimal   @db.Decimal(10, 2)
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model PasswordReset {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  email     String
+  expires   DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+model Admin {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      String   @default("admin") // "admin" or "superadmin"
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+// Prisma Model for Dynamic Texts
+model DynamicContent {
+  id        String   @id @default(cuid())
+  heading   String
+  paragraph String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model WhoAreWe {
+  id          String  @id @default(cuid())
+  heading     String
+  paragraph1  String
+  paragraph2  String
+  imageUrl    String
+}
+model FAQ {
+  id        String  @id @default(cuid())
+  question  String
+  answer    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Order {
+  id            String   @id @default(cuid())
+  orderId       String   @unique
+  deceasedName  String
+  personName    String
+  relation      String
+  serviceDate   DateTime
+  paymentStatus String   @default("Pending") // Pending, Completed
+  email         String
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+model NavbarSettings {
+  id        String  @id @default(cuid())
+  lightLogo String  @default("") // URL for light mode logo
+  darkLogo  String  @default("") // URL for dark mode logo
+  updatedAt DateTime @updatedAt
+}
+model SiteSettings {
+  id         String @id @default(cuid())
+  faviconUrl String? // ✅ Stores the uploaded favicon URL
+}

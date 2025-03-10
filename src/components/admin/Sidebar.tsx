@@ -98,6 +98,9 @@ export default function Sidebar() {
               <Link href="/admin/settings/faq" className="p-2 hover:bg-gray-100 rounded">FAQ Settings</Link>
               <Link href="/admin/settings/navbarsetting" className="p-2 hover:bg-gray-100 rounded">Nav Logo Setting</Link>
               <Link href="/admin/settings/favicosetting" className="p-2 hover:bg-gray-100 rounded">Favico Setting</Link>
+              <Link href="/admin/settings/videosetting" className="p-2 hover:bg-gray-100 rounded">Video Setting</Link>
+              <Link href="/admin/settings/servicesetting" className="p-2 hover:bg-gray-100 rounded">ServicePage Setting</Link>
+              <Link href="/admin/settings/pricepagesetting" className="p-2 hover:bg-gray-100 rounded">PricePage Setting</Link>
             </div>
           )}
         </div>

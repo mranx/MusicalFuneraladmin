@@ -13,7 +13,7 @@ export default function OrdersPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch("/api/order"); // ✅ Corrected URL
+        const response = await fetch("/api/order"); 
         const data = await response.json();
         if (data.success) {
           setOrders(data.orders);
@@ -30,7 +30,7 @@ export default function OrdersPage() {
     fetchOrders();
   }, []);
 
-  // ✅ Handle Editing Order ID & Payment Status
+  // ✅ Handle Editing Order
   const handleEditOrder = (order: any) => {
     setSelectedOrder({
       id: order.id,
@@ -103,34 +103,40 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="p-6 max-w-5xl mx-auto bg-gray-50 min-h-screen">
+    <div className="p-6 max-w-7xl mx-auto bg-gray-50 min-h-screen">
       <h1 className="text-3xl font-bold mb-6 text-gray-800">Manage Orders</h1>
 
       {loading ? (
-        <p className="text-gray-600">Loading orders...</p>
+        <p className="text-gray-600 text-center">Loading orders...</p>
       ) : error ? (
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500 text-center">{error}</p>
       ) : (
         <div className="overflow-x-auto shadow-lg rounded-lg">
           <table className="w-full border border-gray-300 bg-white rounded-md">
             <thead className="bg-gray-800 text-white">
               <tr>
-                <th className="p-3 border">Order ID</th>
-                <th className="p-3 border">Deceased Name</th>
-                <th className="p-3 border">Service Date</th>
-                <th className="p-3 border">Payment Status</th>
-                <th className="p-3 border">Actions</th>
+                <th className="p-4 text-left border">Order ID</th>
+                <th className="p-4 text-left border">Deceased Name</th>
+                <th className="p-4 text-left border">Person Name</th>
+                <th className="p-4 text-left border">Relation</th>
+                <th className="p-4 text-left border">Email</th>
+                <th className="p-4 text-left border">Service Date</th>
+                <th className="p-4 text-left border">Payment Status</th>
+                <th className="p-4 text-center border">Actions</th>
               </tr>
             </thead>
             <tbody>
               {orders.length > 0 ? (
                 orders.map((order) => (
                   <tr key={order.id} className="border-t bg-gray-50 hover:bg-gray-100 transition">
-                    <td className="p-3 border">{order.orderId}</td>
-                    <td className="p-3 border">{order.deceasedName}</td>
-                    <td className="p-3 border">{new Date(order.serviceDate).toLocaleDateString()}</td>
-                    <td className="p-3 border font-semibold">{order.paymentStatus}</td>
-                    <td className="p-3 border relative">
+                    <td className="p-4 border">{order.orderId}</td>
+                    <td className="p-4 border">{order.deceasedName}</td>
+                    <td className="p-4 border">{order.personName}</td>
+                    <td className="p-4 border">{order.relation}</td>
+                    <td className="p-4 border">{order.email}</td>
+                    <td className="p-4 border">{new Date(order.serviceDate).toLocaleDateString()}</td>
+                    <td className="p-4 border font-semibold">{order.paymentStatus}</td>
+                    <td className="p-4 border relative text-center">
                       <button className="bg-blue-600 text-white px-4 py-2 rounded-md shadow-md hover:bg-blue-700" onClick={() => toggleDropdown(order.id)}>
                         Actions ▼
                       </button>
@@ -156,7 +162,7 @@ export default function OrdersPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="p-4 text-center text-gray-600">
+                  <td colSpan={8} className="p-4 text-center text-gray-600">
                     No orders found.
                   </td>
                 </tr>

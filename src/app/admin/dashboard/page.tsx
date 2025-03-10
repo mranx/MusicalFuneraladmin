@@ -10,12 +10,13 @@ ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend)
 export default function DashboardPage() {
   const router = useRouter();
   const [totalUsers, setTotalUsers] = useState<number>(0);
-  const [ongoingOrders] = useState<number>(Math.floor(Math.random() * (10 - 5 + 1)) + 5); // Dummy: 5-10
-  const [completedOrders] = useState<number>(Math.floor(Math.random() * (50 - 20 + 1)) + 20); // Dummy: 20-50
+  const [pendingOrders, setPendingOrders] = useState<number>(0);
+  const [ongoingOrders, setOngoingOrders] = useState<number>(0);
+  const [completedOrders, setCompletedOrders] = useState<number>(0);
   const [isAuthorized, setIsAuthorized] = useState<boolean>(false);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Check if user is Admin or Super Admin
+  // ✅ Check Admin Authentication
   useEffect(() => {
     const checkAdminAuth = async () => {
       try {
@@ -41,10 +42,10 @@ export default function DashboardPage() {
         if (data.role === "admin" || data.role === "superadmin") {
           setIsAuthorized(true);
         } else {
-          router.push("/adminlogin"); // Redirect if not an admin or superadmin
+          router.push("/admin/adminlogin"); // Redirect if not admin/superadmin
         }
       } catch (error) {
-        router.push("/adminlogin"); // Redirect on error
+        router.push("/admin/adminlogin"); // Redirect on error
       } finally {
         setLoading(false);
       }
@@ -78,14 +79,43 @@ export default function DashboardPage() {
     fetchUsersCount();
   }, [isAuthorized]);
 
+  // ✅ Fetch Orders & Categorize Status
+  useEffect(() => {
+    if (!isAuthorized) return;
+
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch("/api/order", {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch orders");
+        }
+
+        const data = await response.json();
+        const orders = data.orders;
+
+        setPendingOrders(orders.filter((order: any) => order.paymentStatus === "Pending").length);
+        setOngoingOrders(orders.filter((order: any) => order.paymentStatus === "In Progress").length);
+        setCompletedOrders(orders.filter((order: any) => order.paymentStatus === "Completed").length);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+      }
+    };
+
+    fetchOrders();
+  }, [isAuthorized]);
+
   // ✅ Chart Data
   const data = {
-    labels: ["Users Registered", "Ongoing Orders", "Completed Orders"],
+    labels: ["Users Registered", "Pending Orders", "Ongoing Orders", "Completed Orders"],
     datasets: [
       {
         label: "Total Count",
-        data: [totalUsers, ongoingOrders, completedOrders],
-        backgroundColor: ["#3B82F6", "#F59E0B", "#10B981"],
+        data: [totalUsers, pendingOrders, ongoingOrders, completedOrders],
+        backgroundColor: ["#3B82F6", "#FACC15", "#F59E0B", "#10B981"],
         borderRadius: 8,
       },
     ],
@@ -97,18 +127,24 @@ export default function DashboardPage() {
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
 
-      {/* ✅ 3 Info Boxes */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {/* ✅ 4 Info Boxes */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* 🔵 Total Users */}
         <div className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center text-center">
           <h2 className="text-xl font-semibold text-gray-700">Total Users</h2>
           <p className="text-4xl font-bold text-blue-500">{totalUsers}</p>
         </div>
 
+        {/* 🟡 Pending Orders */}
+        <div className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center text-center">
+          <h2 className="text-xl font-semibold text-gray-700">Pending Orders</h2>
+          <p className="text-4xl font-bold text-yellow-400">{pendingOrders}</p>
+        </div>
+
         {/* 🟠 Ongoing Orders */}
         <div className="bg-white shadow-lg rounded-lg p-6 flex flex-col items-center text-center">
           <h2 className="text-xl font-semibold text-gray-700">Ongoing Orders</h2>
-          <p className="text-4xl font-bold text-yellow-500">{ongoingOrders}</p>
+          <p className="text-4xl font-bold text-orange-500">{ongoingOrders}</p>
         </div>
 
         {/* 🟢 Completed Orders */}

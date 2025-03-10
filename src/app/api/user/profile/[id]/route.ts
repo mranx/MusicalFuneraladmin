@@ -29,3 +29,35 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     return NextResponse.json({ error: "An error occurred while deleting user" }, { status: 500 });
   }
 }
+export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+  try {
+    const userId = params.id;
+    const body = await request.json();
+    const { name, phone, specialRequests } = body;
+
+    const updatedProfile = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: name || undefined,
+        phone: phone || undefined,
+        specialRequests: specialRequests || undefined,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        phone: true,
+        relation: true,
+        specialRequests: true,
+      },
+    });
+
+    return NextResponse.json({
+      message: "Profile updated successfully",
+      user: updatedProfile,
+    });
+  } catch (error) {
+    console.error("Profile update error:", error);
+    return NextResponse.json({ error: "An error occurred while updating profile" }, { status: 500 });
+  }
+}
